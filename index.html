@@ -26,31 +26,57 @@ nav .links a:hover{color:var(--nav-fg);background:var(--nav-hover)}
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;flex-direction:column;align-items:center;justify-content:center;
   opacity:0;pointer-events:none;transition:opacity .5s;color:#fff;font-size:1.4rem}
 .panel.on{opacity:1;pointer-events:auto}
-.panel .close{position:absolute;top:28px;right:32px;font-size:2rem;cursor:pointer;color:rgba(255,255,255,.5);
-  transition:color .2s;background:none;border:none}
+.panel .close{position:absolute;top:24px;right:28px;font-size:2.2rem;cursor:pointer;color:rgba(255,255,255,.35);
+  transition:color .2s;background:none;border:none;z-index:5;line-height:1}
 .panel .close:hover{color:#fff}
 .panel .home-btn{margin-top:2rem;color:rgba(255,255,255,.4);text-decoration:none;font-size:.9rem;
   transition:color .3s;cursor:pointer}
 .panel .home-btn:hover{color:#fff}
+.pn-home-layout{display:flex;width:80vw;max-width:900px;gap:48px;align-items:center}
+.pn-home-layout .left{flex:0 0 200px;text-align:center}
+.pn-home-layout .left .avatar{width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06);
+  border:2px solid rgba(255,255,255,.15);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:3rem}
+.pn-home-layout .left .status{font-size:.8rem;color:rgba(255,255,255,.35)}
+.pn-home-layout .right{flex:1;min-width:0}
+.pn-home-layout .right h2{font-size:1.6rem;margin-bottom:8px;font-weight:500}
+.pn-home-layout .right .bio{font-size:.9rem;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:20px}
+.pn-home-layout .right .tags{display:flex;flex-wrap:wrap;gap:8px}
+.pn-home-layout .right .tags span{font-size:.75rem;padding:4px 12px;border-radius:12px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)}
+@media(max-width:640px){.pn-home-layout{flex-direction:column;gap:24px;text-align:center}.pn-home-layout .left{flex:0 0 auto}}
 @media(max-width:640px){nav{padding:0 14px;height:48px}nav .brand{font-size:0.9rem}nav .links a{font-size:0.78rem;padding:5px 10px}.hint{bottom:18px;font-size:0.7rem}.cz{width:30vmin;height:30vmin}}
 </style>
 </head>
 <body>
-<nav><span class="brand">✦ 我的空间</span><div class="links"><a href="#" data-page="home">首页</a><a href="#" data-page="le">关于</a><a href="#" data-page="or">项目</a><a href="#" data-page="ly">文章</a><a href="#" data-page="cy">联系</a></div></nav>
+<nav><span class="brand">✦ 我的空间</span><div class="links"><a href="#" data-page="home">首页</a><a href="#" data-page="profile">个人</a><a href="#" data-page="or">项目</a><a href="#" data-page="ly">文章</a><a href="#" data-page="cy">联系</a></div></nav>
 <canvas id="bg"></canvas>
 
 <!-- 四角星座热区 -->
-<div class="cz ly" data-page="ly" title="天琴座 · 文章"></div>
+<div class="cz ly" data-page="profile" title="狮子座 · 个人"></div>
 <div class="cz cy" data-page="cy" title="天鹅座 · 联系"></div>
-<div class="cz le" data-page="le" title="狮子座 · 关于"></div>
-<div class="cz or" data-page="or" title="猎户座 · 项目"></div>
+<div class="cz le" data-page="or" title="猎户座 · 项目"></div>
+<div class="cz or" data-page="ly" title="天琴座 · 文章"></div>
 
 <!-- 页面面板 -->
-<div class="panel" id="pn-home"><span>✦ 欢迎来到我的空间</span></div>
-<div class="panel" id="pn-ly"><button class="close">&times;</button><span>♫ 天琴座 · 文章</span><a class="home-btn" data-page="home">← 返回主页</a></div>
-<div class="panel" id="pn-cy"><button class="close">&times;</button><span>🦢 天鹅座 · 联系</span><a class="home-btn" data-page="home">← 返回主页</a></div>
-<div class="panel" id="pn-le"><button class="close">&times;</button><span>♌ 狮子座 · 关于</span><a class="home-btn" data-page="home">← 返回主页</a></div>
-<div class="panel" id="pn-or"><button class="close">&times;</button><span>🗡 猎户座 · 项目</span><a class="home-btn" data-page="home">← 返回主页</a></div>
+<div class="panel" id="pn-home"><button class="close">&times;</button>
+  <div class="pn-home-layout">
+    <div class="left">
+      <div class="avatar">🌌</div>
+      <div style="font-size:.95rem;color:rgba(255,255,255,.7)">gch</div>
+      <div class="status">🟢 探索宇宙中</div>
+    </div>
+    <div class="right">
+      <h2>✦ 我的空间</h2>
+      <div class="bio">欢迎来到我的个人网站。这里记录了我的项目、文章和想法。黑洞在中心旋转，像引力一样把一切连接在一起。</div>
+      <div class="tags"><span>Three.js</span><span>GLSL</span><span>WebGL</span><span>个人博客</span></div>
+    </div>
+  </div>
+  <a class="home-btn">← 返回主页</a>
+</div>
+<div class="panel" id="pn-profile"><button class="close">&times;</button><span>♌ 狮子座 · 个人</span><a class="home-btn">← 返回主页</a></div>
+<!-- 页面面板 -->
+<div class="panel" id="pn-ly"><button class="close">&times;</button><span>♫ 天琴座 · 文章</span><a class="home-btn">← 返回主页</a></div>
+<div class="panel" id="pn-cy"><button class="close">&times;</button><span>🦢 天鹅座 · 联系</span><a class="home-btn">← 返回主页</a></div>
+<div class="panel" id="pn-or"><button class="close">&times;</button><span>🗡 猎户座 · 项目</span><a class="home-btn">← 返回主页</a></div>
 
 <div class="hint" id="hint">made by gch / 残留v枫楪</div>
 <script>
@@ -66,8 +92,11 @@ function show(id){
 function hide(){
   if(current){document.getElementById('pn-'+current).classList.remove('on');current=null;}
 }
-document.querySelectorAll('nav a[data-page], .cz[data-page], .home-btn[data-page]').forEach(function(el){
+document.querySelectorAll('nav a[data-page], .cz[data-page]').forEach(function(el){
   el.addEventListener('click',function(e){e.preventDefault();show(this.dataset.page);});
+});
+document.querySelectorAll('.home-btn').forEach(function(el){
+  el.addEventListener('click',function(e){e.preventDefault();hide();});
 });
 document.querySelectorAll('.panel .close').forEach(function(el){
   el.addEventListener('click',function(e){e.stopPropagation();hide();});
@@ -89,7 +118,8 @@ var RE=new THREE.Vector2(innerWidth,innerHeight);
 var tc=document.createElement('canvas');tc.width=2048;tc.height=512;
 var tx=tc.getContext('2d');tx.font='600 80px "PingFang SC","Microsoft YaHei UI",sans-serif';
 tx.textAlign='center';tx.textBaseline='middle';tx.shadowColor='rgba(180,210,255,0.5)';tx.shadowBlur=30;
-tx.fillStyle='rgba(255,255,255,0.95)';tx.fillText('欢迎来到我的频道',1024,256);
+tx.font='400 20px "PingFang SC","Microsoft YaHei UI",sans-serif';tx.shadowBlur=4;tx.fillStyle='rgba(255,255,255,0.22)';tx.fillText('点击星图或右上角查看各个栏目',1024,300);
+tx.font='600 80px "PingFang SC","Microsoft YaHei UI",sans-serif';tx.shadowBlur=30;tx.fillStyle='rgba(255,255,255,0.95)';tx.fillText('欢迎来到我的频道',1024,256);
 var te=new THREE.CanvasTexture(tc);te.minFilter=THREE.LinearFilter;te.magFilter=THREE.LinearFilter;
 
 var U={uRes:{value:RE},uTime:{value:0},uBH:{value:new THREE.Vector2(innerWidth*.5,innerHeight*.45)},
@@ -154,32 +184,61 @@ var FS=[
 // CONSTELLATIONS — four star patterns at screen corners
 // ============================================================
 "float segDist(vec2 p,vec2 a,vec2 b){vec2 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h);}",
-"vec3 renderConstellations(vec2 uv,float time){vec3 col=vec3(0);float s=1.+.1*sin(time*.6);vec3 w=vec3(.85);vec3 lc=vec3(.5);",
-  // --- 天琴座 Lyra (左下 Blog) ---
-  "vec2 ly[8];ly[0]=vec2(.12,.22);ly[1]=vec2(.16,.18);ly[2]=vec2(.22,.14);ly[3]=vec2(.26,.16);ly[4]=vec2(.28,.22);ly[5]=vec2(.24,.26);ly[6]=vec2(.18,.27);ly[7]=vec2(.14,.26);",
-  "for(int i=0;i<8;i++){float d=length(uv-ly[i]);float br=i==2?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
-  "for(int i=0;i<7;i++){float d=segDist(uv,ly[i],ly[i+1]);col+=lc*exp(-d*d/.0000015)*.4;}",
-  "col+=lc*exp(-segDist(uv,ly[7],ly[0])*segDist(uv,ly[7],ly[0])/.0000015)*.4;",
-  "col+=lc*exp(-segDist(uv,ly[1],ly[6])*segDist(uv,ly[1],ly[6])/.0000015)*.28;",
-  // --- 天鹅座 Cygnus (右下 Contact) ---
-  "vec2 cy[8];cy[0]=vec2(.72,.14);cy[1]=vec2(.76,.11);cy[2]=vec2(.80,.15);cy[3]=vec2(.85,.20);cy[4]=vec2(.87,.25);cy[5]=vec2(.83,.28);cy[6]=vec2(.78,.26);cy[7]=vec2(.73,.22);",
-  "for(int i=0;i<8;i++){float d=length(uv-cy[i]);float br=i==4?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
-  "for(int i=0;i<7;i++){float d=segDist(uv,cy[i],cy[i+1]);col+=lc*exp(-d*d/.0000015)*.4;}",
-  "col+=lc*exp(-segDist(uv,cy[7],cy[0])*segDist(uv,cy[7],cy[0])/.0000015)*.4;",
-  "col+=lc*exp(-segDist(uv,cy[1],cy[4])*segDist(uv,cy[1],cy[4])/.0000015)*.28;",
-  // --- 狮子座 Leo (左上 About) ---
-  "vec2 le[8];le[0]=vec2(.14,.72);le[1]=vec2(.20,.68);le[2]=vec2(.26,.72);le[3]=vec2(.25,.78);le[4]=vec2(.22,.83);le[5]=vec2(.16,.85);le[6]=vec2(.13,.80);le[7]=vec2(.18,.76);",
-  "for(int i=0;i<8;i++){float d=length(uv-le[i]);float br=i==3?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
-  "for(int i=0;i<7;i++){float d=segDist(uv,le[i],le[i+1]);col+=lc*exp(-d*d/.0000015)*.4;}",
-  "col+=lc*exp(-segDist(uv,le[7],le[0])*segDist(uv,le[7],le[0])/.0000015)*.4;",
-  "col+=lc*exp(-segDist(uv,le[1],le[5])*segDist(uv,le[1],le[5])/.0000015)*.28;",
-  // --- 猎户座 Orion (右上 Projects) ---
-  "vec2 or[8];or[0]=vec2(.76,.84);or[1]=vec2(.82,.87);or[2]=vec2(.80,.80);or[3]=vec2(.79,.77);or[4]=vec2(.81,.74);or[5]=vec2(.86,.70);or[6]=vec2(.82,.82);or[7]=vec2(.74,.80);",
-  "for(int i=0;i<8;i++){float d=length(uv-or[i]);float br=(i==2||i==3||i==6)?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
-  "for(int i=0;i<7;i++){float d=segDist(uv,or[i],or[i+1]);col+=lc*exp(-d*d/.0000015)*.4;}",
-  "col+=lc*exp(-segDist(uv,or[7],or[0])*segDist(uv,or[7],or[0])/.0000015)*.4;",
-  "col+=lc*exp(-segDist(uv,or[2],or[3])*segDist(uv,or[2],or[3])/.0000015)*.5;",
-  "col+=lc*exp(-segDist(uv,or[0],or[5])*segDist(uv,or[0],or[5])/.0000015)*.24;",
+"vec3 renderConstellations(vec2 uv,float time){vec3 col=vec3(0);float s=1.+.1*sin(time*.6);vec3 w=vec3(.85);vec3 lc=vec3(.5);float ls=.0000015;",
+  // === 狮子座 Leo (左上 Home) — 实测9点坐标, scale 0.00019 ===
+  // 1原点(0,0) 2(191,138) 3(85,263) 4核心(469,516) 5(396,613) 6(459,804) 7(576,804) 8(618,508) 9尾(741,384)
+  "vec2 L[9];L[0]=vec2(.120,.690);L[1]=vec2(.156,.716);L[2]=vec2(.136,.740);L[3]=vec2(.209,.788);L[4]=vec2(.195,.806);L[5]=vec2(.207,.843);L[6]=vec2(.229,.843);L[7]=vec2(.237,.787);L[8]=vec2(.261,.763);",
+  "for(int i=0;i<9;i++){float d=length(uv-L[i]);float br=(i==3)?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
+  // 镰刀 Sickle: L[2]→L[3]→L[4]→L[5]→L[6]
+  "col+=lc*exp(-segDist(uv,L[2],L[3])*segDist(uv,L[2],L[3])/ls)*.45;col+=lc*exp(-segDist(uv,L[3],L[4])*segDist(uv,L[3],L[4])/ls)*.45;",
+  "col+=lc*exp(-segDist(uv,L[4],L[5])*segDist(uv,L[4],L[5])/ls)*.45;col+=lc*exp(-segDist(uv,L[5],L[6])*segDist(uv,L[5],L[6])/ls)*.45;",
+  // 躯干 Body: L[3]→L[7]→L[8]
+  "col+=lc*exp(-segDist(uv,L[3],L[7])*segDist(uv,L[3],L[7])/ls)*.4;col+=lc*exp(-segDist(uv,L[7],L[8])*segDist(uv,L[7],L[8])/ls)*.4;",
+  // 底部连接 Bottom: L[0]→L[2], L[0]→L[1], L[1]→L[8]
+  "col+=lc*exp(-segDist(uv,L[0],L[2])*segDist(uv,L[0],L[2])/ls)*.35;col+=lc*exp(-segDist(uv,L[0],L[1])*segDist(uv,L[0],L[1])/ls)*.3;",
+  "col+=lc*exp(-segDist(uv,L[1],L[8])*segDist(uv,L[1],L[8])/ls)*.35;",
+  // === 猎户座 Orion (右上 Projects) — 实测17点, scale 0.00020 ===
+  "vec2 O[17];O[0]=vec2(.720,.675);O[1]=vec2(.730,.720);O[2]=vec2(.741,.723);O[3]=vec2(.748,.730);O[4]=vec2(.762,.716);O[5]=vec2(.778,.683);O[6]=vec2(.760,.771);O[7]=vec2(.742,.792);O[8]=vec2(.705,.777);O[9]=vec2(.693,.791);O[10]=vec2(.676,.820);O[11]=vec2(.695,.856);O[12]=vec2(.823,.774);O[13]=vec2(.822,.788);O[14]=vec2(.822,.766);O[15]=vec2(.818,.749);O[16]=vec2(.806,.741);",
+  "for(int i=0;i<17;i++){float d=length(uv-O[i]);float br=(i==0||i==5||i==8||i==12||(i>=1&&i<=3))?1.5:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
+  // 肩线 Shoulders via chest: O[8]→O[6]→O[7]
+  "col+=lc*exp(-segDist(uv,O[8],O[6])*segDist(uv,O[8],O[6])/ls)*.4;col+=lc*exp(-segDist(uv,O[6],O[7])*segDist(uv,O[6],O[7])/ls)*.4;",
+  // 左躯干 Left body: O[8]→O[0]
+  "col+=lc*exp(-segDist(uv,O[8],O[0])*segDist(uv,O[8],O[0])/ls)*.35;",
+  // 右躯干 Right body: O[6]→O[4]→O[5], 底座 O[0]→O[5]
+  "col+=lc*exp(-segDist(uv,O[6],O[4])*segDist(uv,O[6],O[4])/ls)*.3;col+=lc*exp(-segDist(uv,O[4],O[5])*segDist(uv,O[4],O[5])/ls)*.3;",
+  "col+=lc*exp(-segDist(uv,O[0],O[5])*segDist(uv,O[0],O[5])/ls)*.25;",
+  // 腰带 Belt: O[1]→O[2]→O[3]
+  "col+=lc*exp(-segDist(uv,O[1],O[2])*segDist(uv,O[1],O[2])/ls)*.5;col+=lc*exp(-segDist(uv,O[2],O[3])*segDist(uv,O[2],O[3])/ls)*.5;",
+  // 腰带接胸 Belt→Chest: O[2]→O[6]
+  "col+=lc*exp(-segDist(uv,O[2],O[6])*segDist(uv,O[2],O[6])/ls)*.35;",
+  // 左臂 Left arm: O[8]→O[9]→O[10]→O[11]
+  "col+=lc*exp(-segDist(uv,O[8],O[9])*segDist(uv,O[8],O[9])/ls)*.35;col+=lc*exp(-segDist(uv,O[9],O[10])*segDist(uv,O[9],O[10])/ls)*.35;",
+  "col+=lc*exp(-segDist(uv,O[10],O[11])*segDist(uv,O[10],O[11])/ls)*.35;",
+  // 右臂 Right arm: O[6]→O[12]→O[13], O[12]→O[14]→O[15]→O[16]
+  "col+=lc*exp(-segDist(uv,O[6],O[12])*segDist(uv,O[6],O[12])/ls)*.3;col+=lc*exp(-segDist(uv,O[12],O[13])*segDist(uv,O[12],O[13])/ls)*.3;",
+  "col+=lc*exp(-segDist(uv,O[12],O[14])*segDist(uv,O[12],O[14])/ls)*.3;col+=lc*exp(-segDist(uv,O[14],O[15])*segDist(uv,O[14],O[15])/ls)*.3;",
+  "col+=lc*exp(-segDist(uv,O[15],O[16])*segDist(uv,O[15],O[16])/ls)*.3;",
+  // === 天琴座 Lyra (左下 Blog) — 实测5点, scale 0.00018 ===
+  // 1底星(0,0) 2右(234,165) 3左(-181,489) 4顶(49,666) 5织女星(174,877)
+  "vec2 Y[5];Y[0]=vec2(.140,.120);Y[1]=vec2(.182,.150);Y[2]=vec2(.107,.208);Y[3]=vec2(.149,.240);Y[4]=vec2(.171,.278);",
+  "for(int i=0;i<5;i++){float d=length(uv-Y[i]);float br=(i==0||i==4)?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
+  // 平行四边形 Parallelogram: Y[0]→Y[1]→Y[3]→Y[2]→Y[0]
+  "col+=lc*exp(-segDist(uv,Y[0],Y[1])*segDist(uv,Y[0],Y[1])/ls)*.4;col+=lc*exp(-segDist(uv,Y[1],Y[3])*segDist(uv,Y[1],Y[3])/ls)*.4;",
+  "col+=lc*exp(-segDist(uv,Y[3],Y[2])*segDist(uv,Y[3],Y[2])/ls)*.4;col+=lc*exp(-segDist(uv,Y[2],Y[0])*segDist(uv,Y[2],Y[0])/ls)*.4;",
+  // 织女星连接 Vega: Y[4]→Y[3], Y[4]→Y[2], Y[4]→Y[0]
+  "col+=lc*exp(-segDist(uv,Y[4],Y[3])*segDist(uv,Y[4],Y[3])/ls)*.45;col+=lc*exp(-segDist(uv,Y[4],Y[2])*segDist(uv,Y[4],Y[2])/ls)*.4;",
+  "col+=lc*exp(-segDist(uv,Y[4],Y[0])*segDist(uv,Y[4],Y[0])/ls)*.3;",
+  // === 天鹅座 Cygnus (右下 Contact) — 实测9点, scale 0.00018 ===
+  // 1底(0,0) 2(-306,227) 3中心(-541,358) 4(-683,482) 5(-312,541) 6(-661,131) 7(-891,5) 8(-261,718) 9顶(-184,763)
+  "vec2 C[9];C[0]=vec2(.880,.120);C[1]=vec2(.825,.161);C[2]=vec2(.783,.184);C[3]=vec2(.757,.207);C[4]=vec2(.824,.217);C[5]=vec2(.761,.144);C[6]=vec2(.720,.121);C[7]=vec2(.833,.249);C[8]=vec2(.847,.257);",
+  "for(int i=0;i<9;i++){float d=length(uv-C[i]);float br=(i==0||i==2||i==8)?1.6:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
+  // 竖轴 Vertical: C[8](Deneb)→C[7]→C[2]→C[1]→C[0]
+  "col+=lc*exp(-segDist(uv,C[8],C[7])*segDist(uv,C[8],C[7])/ls)*.45;col+=lc*exp(-segDist(uv,C[7],C[2])*segDist(uv,C[7],C[2])/ls)*.4;",
+  "col+=lc*exp(-segDist(uv,C[2],C[1])*segDist(uv,C[2],C[1])/ls)*.4;col+=lc*exp(-segDist(uv,C[1],C[0])*segDist(uv,C[1],C[0])/ls)*.4;",
+  // 左翼 Left wing: C[2]→C[5]→C[6]
+  "col+=lc*exp(-segDist(uv,C[2],C[5])*segDist(uv,C[2],C[5])/ls)*.4;col+=lc*exp(-segDist(uv,C[5],C[6])*segDist(uv,C[5],C[6])/ls)*.4;",
+  // 右翼 Right wing: C[2]→C[4]→C[3]
+  "col+=lc*exp(-segDist(uv,C[2],C[4])*segDist(uv,C[2],C[4])/ls)*.4;col+=lc*exp(-segDist(uv,C[4],C[3])*segDist(uv,C[4],C[3])/ls)*.4;",
   "return col;}",
 
 // ============================================================
