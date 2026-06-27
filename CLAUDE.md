@@ -4,77 +4,133 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Single-file personal website with a Three.js + custom GLSL gravitational lensing / black hole starfield background. No build system, no dependencies beyond a CDN-hosted Three.js 0.157.
+Single-file personal website (v1.2) — Three.js + custom GLSL black hole / gravitational lensing background with four real constellation star charts at screen corners. Five-page panel navigation system. No build system, no framework.
 
 ## How to develop
-
-Open `index.html` directly in a browser, or serve it:
 
 ```bash
 npx serve .          # then open http://localhost:3000
 ```
 
-No build, no lint, no tests — this is a pure static page.
+Or open `index.html` directly. No build, no lint, no tests.
 
 ## Architecture
 
-Everything lives in `index.html`: CSS (~20 lines), HTML skeleton (~5 lines), and the JS+GLSL application (~300 lines).
+`index.html` contains everything: CSS, HTML, JS navigation, Three.js rendering, GLSL shaders (~450 lines total).
 
-### Shader pipeline (in order, within `main()`)
+### Shader pipeline (render order in `main()`)
 
-1. **`renderBackground(uv)`** — dark space + FBM nebula layers (gas/dust/emission)
-2. **`renderStars(uv, time)`** — 7-octave procedural star field with multi-temperature color (orange → white → blue)
-3. **`lensDeflect(px, bh, r)`** — Schwarzschild weak-field deflection `~1/d` + soft shadow falloff; returns `(deflect, shadow)`
-4. **`renderLens(uv, px, bh, r, lensStrength)`** — applies deflection vector to UV coordinates for lensed sampling
-5. **`renderEventHorizon(px, bh, r)`** — 3D sphere with Fresnel rim light, ambient occlusion, and specular
-6. **`renderPhotonRing(px, bh, r, time)`** — three-layer ring (inner white, mid blue-white, outer glow) with cinematic bloom
-7. **`renderDisk(px, bh, r, time, mouse, lensBoost)`** — accretion disk with procedural turbulence, Doppler asymmetry, front disk + reverse-ray-traced back disk
-8. **`toneMapping(color)`** — relaxed ACES approximation (not exact ACES, tuned for cinematic look)
-9. **`postProcess(color, uv, time)`** — chromatic aberration, film grain, vignette
+1. `renderBackground(uv)` — dark space + FBM nebula
+2. `renderStars(uv, time)` — 7-octave procedural star field
+3. `lensDeflect(px, bh, r)` — gravitational deflection + shadow
+4. `renderLens(uv, px, bh, r, lensStrength)` — apply deflection to UV
+5. Background blend: unlensed → lensed (via `blendLens` at `infR = r*12`)
+6. `renderConstellations(luv, time)` — four real star charts (lensed by BH)
+7. `renderEventHorizon(px, bh, r)` — pure dark sphere, no ring
+8. `renderDisk(px, bh, r, time, mouse, lensBoost)` — three-zone accretion disk
+9. Text overlay + tone mapping + post processing
 
-### JS-side state
+### Disk system (three-zone angular)
 
-- **Black hole position**: autonomous drift (sin/cos of `camDrift` accumulators) + gentle mouse attraction; clamped to viewport edges
-- **Entry animation**: ease-out cubic (`1-(1-t)³`) over ~3.2s growing the BH radius from 0 to target
-- **Mouse tracking**: `pointermove` / `pointerleave` on the canvas; `mouse.y` is in CSS pixels (0 = top) in `uMouse`, but BH uniforms use Three.js convention (y-up)
-- **Reset**: `R` key recenters BH to `(50%, 45%)`
-- **Uniform `uBH`**: Three.js coordinate space — `y` is flipped from CSS (`RE.y - bh.y`)
-- **Uniform `uMouse`**: `(mouse.x / innerWidth, mouse.y)` — x normalized, y in CSS pixels
+| Zone | Mask | Angular center | Purpose |
+|------|------|---------------|---------|
+| Lower disk | `lowerMask` | ang = -π/2 (bottom) | Directly visible front disk |
+| Upper disk | `upperMask` | ang = π/2 (top) | Same radial profile as lower |
+| Middle bridge | `midMask` | d.y distance | Equatorial bridge, tapered width |
 
-## Key constants
+Upper/lower share identical radial parameters: `exp(-diskT*0.3)*1.8`, edge window `smoothstep(diDisk, diDisk+r*.3, dd) * (1-smoothstep(duDisk-r*3.5, duDisk, dd))`.
+
+Middle bridge: cone-shaped width `σ² 0.6~2.5`, fixed warm color, traveling hotspot animation, independent gradient.
+
+### Constellation system
+
+Four real constellations at screen corners, based on user-measured coordinates:
+
+| Position | Constellation | Stars | Panel | Feature |
+|----------|--------------|-------|-------|---------|
+| Top-left | ♌ Leo | 9 | 个人 | Sickle arc + body + tail |
+| Top-right | 🗡 Orion | 17 | 项目 | Hourglass + belt + arms |
+| Bottom-left | ♫ Lyra | 5 | 文章 | Parallelogram + Vega |
+| Bottom-right | 🦢 Cygnus | 9 | 联系 | Northern Cross |
+
+Constellations use lensed UV (`luv`) so they warp near the black hole. White stars, gray lines, subtle breathing animation.
+
+### Navigation & panels
+
+- Navbar: 首页 / 个人 / 项目 / 文章 / 联系 (5 items)
+- Four corner `.cz` click zones (22vmin) overlaid on constellations
+- Semi-transparent panels (`rgba(2,2,12,.65)` + `backdrop-blur`)
+- Home panel: two-column layout (avatar + bio + tags)
+- Esc / ✕ / "返回主页" close panels
+
+### BH movement
+
+- Mouse near (<45% screen) → gravitational attraction (pull 0.4~1.6)
+- Mouse far → patrol to random waypoints every 5~8s at constant speed (50px/s)
+- Movement uses constant-velocity (not lerp) to avoid acceleration artifacts
+
+## Key constants (v1.2)
 
 | Constant | Value | Location |
-|---|---|---|
-| Target BH radius | `Math.min(w,h) * 0.06` | JS `TR` (line 301) |
-| Lens influence radius | `r * 12.0` | FS `infR` (line 269) |
-| Shadow inner | `r * 0.35` | `lensDeflect` |
-| Shadow outer | `r * 3.2` | `lensDeflect` |
-| Photon ring radius | `r * 1.5` | `renderPhotonRing` |
-| Disk inner/outer | `r*2.2` / `r*6.5` | `renderDisk` |
-| Star layer count | 7 | `renderStars` loop |
-| FBM octaves | 4 | `fbm()` loop |
-| Canvas texture | 2048×512 | `tc` (line 40) |
+|----------|-------|----------|
+| BH radius | `min(w,h) * 0.035` | JS `TR` |
+| Lens influence | `r * 12.0` | FS `infR` |
+| Deflection strength | `r² * 14` | FS `lensDeflect` |
+| Disk inner/outer | `r*2.2` / `r*6.5` | FS `diDisk/duDisk` |
+| Disk falloff | `exp(-diskT * 0.3)` | FS `rad` |
+| Middle bridge length | `duDisk * 1.65` | FS if-condition |
+| Middle bridge width | `σ² = 0.6 ~ 2.5` (tapered) | FS `midW` |
+| Attract range | `min(w,h) * 0.45` | JS |
+| Star density | `thr = 0.014 + L * 0.007` | FS `renderStars` |
 
-## Known bugs & pitfalls
+## GLSL pitfalls
 
-### GLSL NaN propagation through `smoothstep(a, a, x)`
-
-When `r == 0` (initial state before entry animation), `smoothstep(0, 0, dist)` returned NaN on some GPUs. The NaN propagated through `mix()`, then to `gl_FragColor`, causing a fully black screen. The fix was guarding with `if (influenceR > 0.5)` before calling `smoothstep`. This pattern should be checked for every `smoothstep` call where edge0 and edge1 could ever be equal.
-
-### Other GLSL undefined behaviors to watch for
-
-- `smoothstep(a, a, x)` — undefined when edges equal
-- `normalize(vec2(0))` — produces NaN
-- Division by zero in any expression
+- `smoothstep(a, a, x)` — undefined when edges equal (causes NaN → black screen)
+- `normalize(vec2(0))` — NaN
 - `atan(0, 0)` — undefined
+- `doppler` was fixed: `sin(beamAngle*0.5)` → `cos(beamAngle)` to remove ±π discontinuity
 
-### Coordinate space mismatch
+## Coordinate spaces
 
-`uBH` uses Three.js y-up coordinates (`RE.y - bh.y`), while `uMouse.y` is in CSS pixels (0 = top). Be careful when passing mouse-relative coordinates into shader functions that operate on `uBH` space.
+- `uBH`: Three.js y-up (`RE.y - bh.y`)
+- `uMouse.y`: CSS pixels (0 = top)
+- GLSL UV: (0,0) = bottom-left
+- CSS positioning: (0,0) = top-left
 
-## UI summary
+---
 
-- Fixed navbar with glassmorphism effect (`backdrop-filter: blur`)
-- "移动鼠标探索 · 按 R 重置" hint at bottom (replaced by GL error text if shader compile fails)
-- Responsive: mobile breakpoint at 640px
-- Font stack: native system fonts with Chinese fallbacks (PingFang SC, Microsoft YaHei)
+## Migration plan → Next.js (v2.0)
+
+Target stack: **Next.js + Vercel + Neon PostgreSQL + Cloudflare R2 + GitHub OAuth**
+
+### Phase 1: Framework migration
+- Scaffold Next.js project
+- Port GLSL shaders into React component (useEffect + useRef for Three.js)
+- Port CSS to Tailwind or CSS modules
+- Port panel system to React state / Next.js routes
+- **Goal**: same visual, modern architecture
+
+### Phase 2: Database + auth
+- Prisma schema: users, articles, projects, messages, ai_chat
+- NextAuth.js with GitHub OAuth
+- Admin-only content management
+
+### Phase 3: Dynamic content
+- Article CRUD (Markdown)
+- Project cards from DB
+- Contact form → DB
+
+### Phase 4: AI assistant
+- Floating AI chat widget (bottom-right)
+- API key stored in Vercel env vars
+- Chat history in DB
+
+### Phase 5: Storage + domain
+- Cloudflare R2 for images
+- Custom domain + DNS
+
+### Core assets (framework-agnostic, must preserve)
+- GLSL shader source (renderBackground, renderStars, lensDeflect, renderLens, renderEventHorizon, renderDisk, renderConstellations, toneMapping, postProcess)
+- Constellation star coordinates
+- Black hole visual parameters
+- Panel layout design
