@@ -19,13 +19,62 @@ nav .links a:hover{color:var(--nav-fg);background:var(--nav-hover)}
 #bg{position:fixed;inset:0;width:100%;height:100%;display:block}
 .hint{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:60;font-size:0.8rem;
   color:rgba(255,255,255,0.3);pointer-events:none;letter-spacing:0.04em}
-@media(max-width:640px){nav{padding:0 14px;height:48px}nav .brand{font-size:0.9rem}nav .links a{font-size:0.78rem;padding:5px 10px}.hint{bottom:18px;font-size:0.7rem}}
+.cz{position:fixed;z-index:50;width:22vmin;height:22vmin;cursor:pointer;transition:opacity .5s}
+.cz:hover{opacity:1!important}.cz.ly{top:8vh;left:8vw}.cz.cy{bottom:8vh;right:8vw}
+.cz.le{top:8vh;right:8vw}.cz.or{bottom:8vh;left:8vw}
+.panel{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:80;background:rgba(2,2,12,.65);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .5s;color:#fff;font-size:1.4rem}
+.panel.on{opacity:1;pointer-events:auto}
+.panel .close{position:absolute;top:28px;right:32px;font-size:2rem;cursor:pointer;color:rgba(255,255,255,.5);
+  transition:color .2s;background:none;border:none}
+.panel .close:hover{color:#fff}
+.panel .home-btn{margin-top:2rem;color:rgba(255,255,255,.4);text-decoration:none;font-size:.9rem;
+  transition:color .3s;cursor:pointer}
+.panel .home-btn:hover{color:#fff}
+@media(max-width:640px){nav{padding:0 14px;height:48px}nav .brand{font-size:0.9rem}nav .links a{font-size:0.78rem;padding:5px 10px}.hint{bottom:18px;font-size:0.7rem}.cz{width:30vmin;height:30vmin}}
 </style>
 </head>
 <body>
-<nav><span class="brand">✦ 我的空间</span><div class="links"><a href="#">首页</a><a href="#">关于</a><a href="#">文章</a><a href="#">联系</a></div></nav>
+<nav><span class="brand">✦ 我的空间</span><div class="links"><a href="#" data-page="home">首页</a><a href="#" data-page="le">关于</a><a href="#" data-page="or">项目</a><a href="#" data-page="ly">文章</a><a href="#" data-page="cy">联系</a></div></nav>
 <canvas id="bg"></canvas>
+
+<!-- 四角星座热区 -->
+<div class="cz ly" data-page="ly" title="天琴座 · 文章"></div>
+<div class="cz cy" data-page="cy" title="天鹅座 · 联系"></div>
+<div class="cz le" data-page="le" title="狮子座 · 关于"></div>
+<div class="cz or" data-page="or" title="猎户座 · 项目"></div>
+
+<!-- 页面面板 -->
+<div class="panel" id="pn-home"><span>✦ 欢迎来到我的空间</span></div>
+<div class="panel" id="pn-ly"><button class="close">&times;</button><span>♫ 天琴座 · 文章</span><a class="home-btn" data-page="home">← 返回主页</a></div>
+<div class="panel" id="pn-cy"><button class="close">&times;</button><span>🦢 天鹅座 · 联系</span><a class="home-btn" data-page="home">← 返回主页</a></div>
+<div class="panel" id="pn-le"><button class="close">&times;</button><span>♌ 狮子座 · 关于</span><a class="home-btn" data-page="home">← 返回主页</a></div>
+<div class="panel" id="pn-or"><button class="close">&times;</button><span>🗡 猎户座 · 项目</span><a class="home-btn" data-page="home">← 返回主页</a></div>
+
 <div class="hint" id="hint">made by gch / 残留v枫楪</div>
+<script>
+// Page navigation
+(function(){
+var current=null;
+function show(id){
+  if(current===id)return hide();
+  if(current)document.getElementById('pn-'+current).classList.remove('on');
+  var pn=document.getElementById('pn-'+id);
+  if(pn){pn.classList.add('on');current=id;}
+}
+function hide(){
+  if(current){document.getElementById('pn-'+current).classList.remove('on');current=null;}
+}
+document.querySelectorAll('nav a[data-page], .cz[data-page], .home-btn[data-page]').forEach(function(el){
+  el.addEventListener('click',function(e){e.preventDefault();show(this.dataset.page);});
+});
+document.querySelectorAll('.panel .close').forEach(function(el){
+  el.addEventListener('click',function(e){e.stopPropagation();hide();});
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')hide();});
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
 <script>
 (function(){
@@ -99,6 +148,38 @@ var FS=[
       // Star profile — varied sizes
       "float d=length(lo);float st=1.-smoothstep(0.,.5,d*(4.5+float(L)*1.3));st=pow(st,3.5);",
       "col+=sc*st*br*tw*2.8;}}",
+  "return col;}",
+
+// ============================================================
+// CONSTELLATIONS — four star patterns at screen corners
+// ============================================================
+"float segDist(vec2 p,vec2 a,vec2 b){vec2 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h);}",
+"vec3 renderConstellations(vec2 uv,float time){vec3 col=vec3(0);float s=1.+.1*sin(time*.6);vec3 w=vec3(.85);vec3 lc=vec3(.5);",
+  // --- 天琴座 Lyra (左下 Blog) ---
+  "vec2 ly[8];ly[0]=vec2(.12,.22);ly[1]=vec2(.16,.18);ly[2]=vec2(.22,.14);ly[3]=vec2(.26,.16);ly[4]=vec2(.28,.22);ly[5]=vec2(.24,.26);ly[6]=vec2(.18,.27);ly[7]=vec2(.14,.26);",
+  "for(int i=0;i<8;i++){float d=length(uv-ly[i]);float br=i==2?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
+  "for(int i=0;i<7;i++){float d=segDist(uv,ly[i],ly[i+1]);col+=lc*exp(-d*d/.0000015)*.4;}",
+  "col+=lc*exp(-segDist(uv,ly[7],ly[0])*segDist(uv,ly[7],ly[0])/.0000015)*.4;",
+  "col+=lc*exp(-segDist(uv,ly[1],ly[6])*segDist(uv,ly[1],ly[6])/.0000015)*.28;",
+  // --- 天鹅座 Cygnus (右下 Contact) ---
+  "vec2 cy[8];cy[0]=vec2(.72,.14);cy[1]=vec2(.76,.11);cy[2]=vec2(.80,.15);cy[3]=vec2(.85,.20);cy[4]=vec2(.87,.25);cy[5]=vec2(.83,.28);cy[6]=vec2(.78,.26);cy[7]=vec2(.73,.22);",
+  "for(int i=0;i<8;i++){float d=length(uv-cy[i]);float br=i==4?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
+  "for(int i=0;i<7;i++){float d=segDist(uv,cy[i],cy[i+1]);col+=lc*exp(-d*d/.0000015)*.4;}",
+  "col+=lc*exp(-segDist(uv,cy[7],cy[0])*segDist(uv,cy[7],cy[0])/.0000015)*.4;",
+  "col+=lc*exp(-segDist(uv,cy[1],cy[4])*segDist(uv,cy[1],cy[4])/.0000015)*.28;",
+  // --- 狮子座 Leo (左上 About) ---
+  "vec2 le[8];le[0]=vec2(.14,.72);le[1]=vec2(.20,.68);le[2]=vec2(.26,.72);le[3]=vec2(.25,.78);le[4]=vec2(.22,.83);le[5]=vec2(.16,.85);le[6]=vec2(.13,.80);le[7]=vec2(.18,.76);",
+  "for(int i=0;i<8;i++){float d=length(uv-le[i]);float br=i==3?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
+  "for(int i=0;i<7;i++){float d=segDist(uv,le[i],le[i+1]);col+=lc*exp(-d*d/.0000015)*.4;}",
+  "col+=lc*exp(-segDist(uv,le[7],le[0])*segDist(uv,le[7],le[0])/.0000015)*.4;",
+  "col+=lc*exp(-segDist(uv,le[1],le[5])*segDist(uv,le[1],le[5])/.0000015)*.28;",
+  // --- 猎户座 Orion (右上 Projects) ---
+  "vec2 or[8];or[0]=vec2(.76,.84);or[1]=vec2(.82,.87);or[2]=vec2(.80,.80);or[3]=vec2(.79,.77);or[4]=vec2(.81,.74);or[5]=vec2(.86,.70);or[6]=vec2(.82,.82);or[7]=vec2(.74,.80);",
+  "for(int i=0;i<8;i++){float d=length(uv-or[i]);float br=(i==2||i==3||i==6)?1.8:1.;col+=w*(exp(-d*d/.00008)*br+exp(-d*d/.0004)*.1)*s;}",
+  "for(int i=0;i<7;i++){float d=segDist(uv,or[i],or[i+1]);col+=lc*exp(-d*d/.0000015)*.4;}",
+  "col+=lc*exp(-segDist(uv,or[7],or[0])*segDist(uv,or[7],or[0])/.0000015)*.4;",
+  "col+=lc*exp(-segDist(uv,or[2],or[3])*segDist(uv,or[2],or[3])/.0000015)*.5;",
+  "col+=lc*exp(-segDist(uv,or[0],or[5])*segDist(uv,or[0],or[5])/.0000015)*.24;",
   "return col;}",
 
 // ============================================================
@@ -250,6 +331,9 @@ var FS=[
   // Gravitational shadow
   "color*=.02+.98*shadow;",
 
+  // Constellations (corner star patterns, lensed by BH gravity)
+  "color+=renderConstellations(luv,time);",
+
   // Render black hole components
   "color+=renderEventHorizon(px,bh,r);",
   "color+=renderDisk(px,bh,r,time,mouse,lensBoost);",
@@ -297,19 +381,29 @@ function A(ts){requestAnimationFrame(A);
   var el=ts-bh.animStart,at=Math.min(el/bh.animDur,1.),ea=1.-Math.pow(1.-at,3.);
   bh.radius=TR*ea;
 
-  // Autonomous drift (only when mouse is idle)
-  camDrift.x+=.0003*dt;camDrift.y+=.0002*dt;camDrift.zoom+=.0001*dt;
-  var driftX=Math.sin(camDrift.x*.5)*innerWidth*.35+Math.cos(camDrift.y*.7)*innerWidth*.2;
-  var driftY=Math.cos(camDrift.x*.4)*innerHeight*.3+Math.sin(camDrift.y*.6)*innerHeight*.2;
-  if(mouseOn){
-    bhTarget.x=mouse.x;
-    bhTarget.y=mouse.y;
-  }else{
-    bhTarget.x=innerWidth*.5+driftX;
-    bhTarget.y=innerHeight*.45+driftY;
+  // BH movement: mouse priority, else patrol to random waypoints
+  var dx=mouse.x-bh.x,dy=mouse.y-bh.y,distToMouse=Math.sqrt(dx*dx+dy*dy);
+  var attractRange=Math.min(innerWidth,innerHeight)*.45;
+  // Generate new waypoint when BH reaches current one (or every 5-8s)
+  var distToTarget=Math.sqrt((bh.x-camDrift.x)*(bh.x-camDrift.x)+(bh.y-camDrift.y)*(bh.y-camDrift.y));
+  camDrift.zoom-=dt;
+  if(camDrift.zoom<=0||distToTarget<60){
+    camDrift.zoom=5.+Math.random()*3.;
+    camDrift.x=80+Math.random()*(innerWidth-160);
+    camDrift.y=80+Math.random()*(innerHeight-160);
   }
-  var smooth=0.5*dt;
-  bh.x+=(bhTarget.x-bh.x)*smooth;bh.y+=(bhTarget.y-bh.y)*smooth;
+  bhTarget.x=camDrift.x;
+  bhTarget.y=camDrift.y;
+  if(mouseOn&&distToMouse<attractRange){
+    // Mouse nearby → override with attraction
+    var pull=0.4+1.2*(1.-distToMouse/attractRange);
+    bhTarget.x=bh.x+dx*pull;
+    bhTarget.y=bh.y+dy*pull;
+  }
+  // Move toward target at constant speed (no accel/decel)
+  var tx=bhTarget.x-bh.x,ty=bhTarget.y-bh.y,td=Math.sqrt(tx*tx+ty*ty);
+  var speed=mouseOn&&distToMouse<attractRange?120:50;
+  if(td>1.){var step=Math.min(speed*dt,td);bh.x+=tx/td*step;bh.y+=ty/td*step;}
   bh.x=Math.min(innerWidth-5,Math.max(5,bh.x));
   bh.y=Math.min(innerHeight-5,Math.max(5,bh.y));
 
